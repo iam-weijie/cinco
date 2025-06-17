@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Cinco",
+  title: "Play Cinco",
   description: "Outsmart your opponent by being the first to align 5 pieces in a row",
 };
 
