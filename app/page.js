@@ -9,7 +9,7 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState(false);
   const [startingPlayer, setStartingPlayer] = useState("player1"); // start with player1
 
-  const canStart = player1.trim() !== "" && player2.trim() !== "";
+  const canStart = player1.trim() !== "" && player2.trim() !== "" && player1.trim().toLowerCase() !== player2.trim().toLowerCase();
 
   const handleStart = () => {
     setGameStarted(true);
@@ -78,6 +78,9 @@ export default function Home() {
         onChange={(e) => setPlayer2(e.target.value)}
         style={{ display: "block", margin: "8px 0", padding: 6, width: "100%" }}
       />
+      {player1.trim().toLowerCase() === player2.trim().toLowerCase() && player1.trim() !== "" && (
+        <p style={{ color: "red" }}>Player names can’t be the same!</p>
+      )}
       <button
         onClick={handleStart}
         disabled={!canStart}
