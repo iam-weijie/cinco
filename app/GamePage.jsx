@@ -2,72 +2,68 @@
 
 import React, { useState } from "react";
 
-const BOARD_SIZE = 4;
-const COLORS = ["white", "black"];
+const BOARD_SIZE = 5;
 const SHAPES = ["circle", "square"];
 
-export default function GamePage({ player1, player2 }) {
+export default function GamePage({ player1, player2, player1Color, player2Color, startingPlayer, onRestart, onHome }) {
   const [board, setBoard] = useState(
     Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null))
   );
-  const [turn, setTurn] = useState(player1);
-  const [selectedPiece, setSelectedPiece] = useState(null);
+  const [turn, setTurn] = useState(startingPlayer);
+  const [selectedShape, setSelectedShape] = useState(null);
   const [winner, setWinner] = useState(null);
 
-  function shareTrait(pieces) {
-    if (pieces.includes(null)) return false;
-    const sameColor = pieces.every((p) => p.color === pieces[0].color);
-    const sameShape = pieces.every((p) => p.shape === pieces[0].shape);
-    return sameColor || sameShape;
-  }
+  const currentColor = turn === player1 ? player1Color : player2Color;
 
-  function checkWin(r, c) {
-    // We need to use the updated board state, not the old one
+  function checkWin(r, c, piece) {
     const currentBoard = [...board];
-    currentBoard[r][c] = selectedPiece;
+    currentBoard[r][c] = piece;
 
-    // Check horizontal line
-    const horizontal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[r][i]);
-    if (shareTrait(horizontal)) return true;
+    const directions = [
+      [[0, 1], [0, -1]],
+      [[1, 0], [-1, 0]],
+      [[1, 1], [-1, -1]],
+      [[1, -1], [-1, 1]],
+    ];
 
-    // Check vertical line
-    const vertical = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][c]);
-    if (shareTrait(vertical)) return true;
+    for (const dir of directions) {
+      for (const trait of ["color", "shape"]) {
+        let count = 1;
 
-    // Check main diagonal (if the placed piece is on it)
-    if (r === c) {
-      const mainDiagonal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][i]);
-      if (shareTrait(mainDiagonal)) return true;
-    }
+        for (const [dx, dy] of dir) {
+          let x = r + dx;
+          let y = c + dy;
 
-    // Check anti-diagonal (if the placed piece is on it)
-    if (r + c === BOARD_SIZE - 1) {
-      const antiDiagonal = [...Array(BOARD_SIZE).keys()].map((i) => currentBoard[i][BOARD_SIZE - 1 - i]);
-      if (shareTrait(antiDiagonal)) return true;
-    }
+          while (
+            x >= 0 &&
+            x < BOARD_SIZE &&
+            y >= 0 &&
+            y < BOARD_SIZE &&
+            currentBoard[x][y] &&
+            currentBoard[x][y][trait] === piece[trait]
+          ) {
+            count++;
+            x += dx;
+            y += dy;
+          }
+        }
 
-    // Check all possible 2x2 blocks that include the placed piece
-    const blocks = [];
-    if (r > 0 && c > 0) blocks.push([[r - 1, c - 1], [r - 1, c], [r, c - 1], [r, c]]);
-    if (r > 0 && c < BOARD_SIZE - 1) blocks.push([[r - 1, c], [r - 1, c + 1], [r, c], [r, c + 1]]);
-    if (r < BOARD_SIZE - 1 && c > 0) blocks.push([[r, c - 1], [r, c], [r + 1, c - 1], [r + 1, c]]);
-    if (r < BOARD_SIZE - 1 && c < BOARD_SIZE - 1) blocks.push([[r, c], [r, c + 1], [r + 1, c], [r + 1, c + 1]]);
-
-    for (let block of blocks) {
-      const pieces = block.map(([x, y]) => currentBoard[x][y]);
-      if (shareTrait(pieces)) return true;
+        if (count >= 5) return true;
+      }
     }
 
     return false;
   }
 
   function handleCellClick(r, c) {
-    if (winner || !selectedPiece || board[r][c]) return;
+    if (winner || !selectedShape || board[r][c]) return;
+
     const newBoard = board.map((row) => row.slice());
-    newBoard[r][c] = selectedPiece;
+    const piece = { color: currentColor, shape: selectedShape };
+    newBoard[r][c] = piece;
     setBoard(newBoard);
 
-    if (checkWin(r, c)) {
+    if (checkWin(r, c, piece)) {
       setWinner(turn);
       return;
     }
@@ -78,7 +74,7 @@ export default function GamePage({ player1, player2 }) {
     }
 
     setTurn(turn === player1 ? player2 : player1);
-    setSelectedPiece(null);
+    setSelectedShape(null);
   }
 
   function renderPiece({ color, shape }) {
@@ -92,7 +88,7 @@ export default function GamePage({ player1, player2 }) {
     };
     return shape === "circle"
       ? <div style={{ ...base, borderRadius: "50%" }} />
-      : <div style={{ ...base }} />;
+      : <div style={base} />;
   }
 
   return (
@@ -130,51 +126,56 @@ export default function GamePage({ player1, player2 }) {
       </div>
 
       <div>
-        <p>Select a piece:</p>
+        <p>Select a shape:</p>
         <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
-          {COLORS.map((color) =>
-            SHAPES.map((shape) => {
-              const piece = { color, shape };
-              const isSelected = selectedPiece &&
-                selectedPiece.color === color &&
-                selectedPiece.shape === shape;
-              return (
-                <div
-                  key={`${color}-${shape}`}
-                  onClick={() => setSelectedPiece(piece)}
-                  style={{
-                    padding: 5,
-                    border: isSelected ? "3px solid gold" : "2px solid #aaa",
-                    borderRadius: 4,
-                    margin: "4px",
-                    cursor: "pointer"
-                  }}
-                >
-                  {renderPiece(piece)}
-                </div>
-              );
-            })
-          )}
+          {SHAPES.map((shape) => {
+            const piece = { color: currentColor, shape };
+            const isSelected = selectedShape === shape;
+            return (
+              <div
+                key={shape}
+                onClick={() => setSelectedShape(shape)}
+                style={{
+                  padding: 5,
+                  border: isSelected ? "3px solid gold" : "2px solid #aaa",
+                  borderRadius: 4,
+                  margin: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                {renderPiece(piece)}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {winner && (
-        <button
-          onClick={() => {
-            setBoard(Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null)));
-            setWinner(null);
-            setTurn(player1);
-            setSelectedPiece(null);
-          }}
-          style={{
-            marginTop: 15,
-            padding: "8px 16px",
-            fontSize: 16,
-            cursor: "pointer"
-          }}
-        >
-          Restart Game
-        </button>
+        <>
+          <button
+            onClick={() => {
+              setBoard(Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null)));
+              setWinner(null);
+              setTurn(startingPlayer); // Use dynamic starting player again
+              setSelectedShape(null);
+              onRestart(); // Notify parent to alternate starter
+            }}
+            style={{
+              marginTop: 15,
+              padding: "8px 16px",
+              fontSize: 16,
+              cursor: "pointer"
+            }}
+          >
+            Restart Game
+          </button>
+          <button
+            onClick={onHome}
+            style={{ marginLeft: 10, padding: "8px 16px", fontSize: 16, cursor: "pointer" }}
+          >
+            Return Home
+          </button>
+        </>
       )}
     </div>
   );
