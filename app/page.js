@@ -14,6 +14,8 @@ export default function Home() {
     <GamePage
       player1={player1}
       player2={player2}
+      player1Color = "white"
+      player2Color = "black"
       onRestart={() => setGameStarted(false)}
     />
   ) : (
@@ -25,8 +27,7 @@ export default function Home() {
       <br/>
       <h2>🏆 Win conditions:</h2>
       <ul>
-        <li>4 pieces sharing a trait (color or shape) in a row, column, or diagonal</li>
-        <li>OR 4 in a 2×2 square block</li>
+        <li>5 pieces sharing a trait (color or shape) in a row, column, or diagonal</li>
       </ul>
       <br/>
       <h2>🎲 Pieces:</h2>
@@ -38,8 +39,7 @@ export default function Home() {
       <br/>
       <h2>🕹 How to Play:</h2>
       <ol>
-        <li>Players take turns selecting a piece to place on the board</li>
-        <li>You can’t use the same space twice</li>
+        <li>Players start with a color, take turns selecting a piece to place on the board</li>
         <li>Keep playing until someone wins — or the board fills up (draw!)</li>
       </ol>
       <br/>
