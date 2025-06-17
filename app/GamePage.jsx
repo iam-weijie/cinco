@@ -83,7 +83,7 @@ export default function GamePage({ player1, player2, player1Color, player2Color,
       width: 30,
       height: 30,
       margin: 5,
-      border: "2px solid black",
+      border: color === "black" ? "2px solid white" : "2px solid black",
       backgroundColor: color,
     };
     return shape === "circle"
