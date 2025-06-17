@@ -18,10 +18,10 @@ export default function Home() {
     />
   ) : (
     <div style={{ padding: 20, fontFamily: "sans-serif", maxWidth: 600, margin: "0 auto" }}>
-      <h1>Welcome to Quatro</h1>
+      <h1>Welcome to Cinco</h1>
       <br/>
       <h2>🎯 Goal:</h2>
-      <p>Outsmart your opponent by being the first to align 4 pieces in a row or form a 2×2 block</p>
+      <p>Outsmart your opponent by being the first to align 5 pieces in a row</p>
       <br/>
       <h2>🏆 Win conditions:</h2>
       <ul>

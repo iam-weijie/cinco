@@ -97,7 +97,7 @@ export default function GamePage({ player1, player2 }) {
 
   return (
     <div style={{ fontFamily: "sans-serif", maxWidth: 400, margin: "20px auto", textAlign: "center" }}>
-      <h1>Quatro</h1>
+      <h1>Cinco</h1>
       <h3>{winner ? (winner === "Draw" ? "It's a draw!" : `${winner} wins! 🎉`) : `${turn}'s turn`}</h3>
 
       <div style={{
