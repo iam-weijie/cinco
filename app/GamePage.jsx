@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-const BOARD_SIZE = 7;
+const BOARD_SIZE = 6;
 const SHAPES = ["circle", "square"];
 
 export default function GamePage({ player1, player2, player1Color, player2Color, startingPlayer, onRestart, onHome }) {
